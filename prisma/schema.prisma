@@ -1,0 +1,58 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+model User {
+  id String @id @unique @default(uuid())
+  session String @unique @default(uuid())
+  name String @unique
+  password String
+
+  Splits Split[]
+}
+
+model Split {
+  id Int @id @unique @default(autoincrement())
+  split_name String
+  status Boolean @default(true)
+  visibility Visibility @default(public)
+
+  Trainings Training[]
+   
+  UserId String
+  User User @relation(fields: [UserId], references: [id], onDelete: Cascade)
+}
+
+model Training {
+  id Int @id @unique @default(autoincrement())
+  date Int
+  muscle_group String
+  time_to_rest Int
+
+  Exercises Exercise[]
+
+  SplitId Int 
+  Split Split @relation(fields: [SplitId], references: [id], onDelete: Cascade)
+}
+
+model Exercise {
+  id Int @id @unique @default(autoincrement())
+  times Int 
+  muscle_group String
+  
+
+  TrainingId Int
+  Training Training @relation(fields: [TrainingId], references: [id], onDelete: Cascade)
+  
+}
+
+enum Visibility {
+  public
+  private
+}
